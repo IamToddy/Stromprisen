@@ -104,6 +104,7 @@
                 return prices;
             } catch (error) {
                 document.getElementById('error').innerText = 'Kunne ikke hente strømpriser. Vennligst prøv igjen senere.';
+                console.error('Fetch error:', error);
                 return [];
             }
         }
@@ -113,7 +114,10 @@
             const prices = await fetchPrices(region);
             
             const ctx = document.getElementById('priceChart').getContext('2d');
-            new Chart(ctx, {
+            if (window.priceChart) {
+                window.priceChart.destroy();
+            }
+            window.priceChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: prices.map(p => p.time),
@@ -142,7 +146,7 @@
                 document.getElementById('totalCost').innerText = 'Data ikke tilgjengelig';
                 return;
             }
-            const coffeePrice = prices.find(p => p.time === '07:30').price * 0.5;
+            const coffeePrice = prices.find(p => p.time === '07:00').price * 0.5;
             const showerPrice = prices.find(p => p.time === '09:00').price * 2;
             const washingMachinePrice = prices.find(p => p.time === '17:00').price * 3;
             const heatingPrice = 5; // Antar en fast rate for enkelhets skyld
